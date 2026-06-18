@@ -46,7 +46,10 @@ trap 'rm -f "$TMP_WAV" "$TMP_NORM"' EXIT
 # ---- Audio settings (matched to GLaDOS pack output) -------------------------
 SAMPLE_RATE=16000
 BITRATE=100        # kbps — used by oggenc --bitrate
-LOUDNORM="loudnorm=I=-14:LRA=1:dual_mono=true:tp=-1"
+LOUDNORM="loudnorm=I=-10:LRA=1:dual_mono=true:tp=-1"
+PIPER_LENGTH_SCALE=1.15
+PIPER_NOISE_W=0.5
+PIPER_SENTENCE_SILENCE=0.35
 
 # ---- Main generation loop ---------------------------------------------------
 generated_files=()
@@ -72,6 +75,9 @@ while IFS=$'\t' read -r id text; do
     if ! printf '%s\n' "$text" \
             | python3 -m piper \
                 --model "$MODEL" \
+                --length-scale "$PIPER_LENGTH_SCALE" \
+                --noise-w "$PIPER_NOISE_W" \
+                --sentence-silence "$PIPER_SENTENCE_SILENCE" \
                 --output_file "$TMP_WAV" \
                 2>/dev/null; then
         echo "       WARNING: piper failed for ID $id — skipping"
